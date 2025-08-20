@@ -3,7 +3,11 @@ import os
 import requests
 from dotenv import load_dotenv
 from langchain.prompts import PromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_openai import ChatOpenAI
+
+load_dotenv()
+
+API_KEY = os.environ.get("CLOVA_STUDIO_API_KEY")
 
 
 def scrape_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
@@ -50,7 +54,16 @@ if __name__ == "__main__":
         template=summary_template, input_variables=["information"]
     )
 
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatOpenAI(
+        api_key=API_KEY,  # CLOVA Studio API 키
+        base_url="https://clovastudio.stream.ntruss.com/v1/openai",  # CLOVA Studio 오픈AI 호환 API URL
+        # model="HCX-005",
+        model="HCX-007",
+        streaming=True,
+        extra_body={
+            "reasoning": {"effort": "none"},
+        },
+    )
 
     chain = summary_prompt_template | llm
 
